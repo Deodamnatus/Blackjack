@@ -4,7 +4,7 @@ from random import shuffle
 def generateDecks(numDeck):
     deck = []
 
-    class Card():
+    class Card:
         suit = ''
         value = 0
 
@@ -12,7 +12,7 @@ def generateDecks(numDeck):
         for value in range(1, 14):
             currCard = Card()
             currCard.suit = suit
-            currcard.card = value
+            currCard.card = value
             if value >=10:
                 currCard.value = 10
             else:
@@ -24,6 +24,9 @@ def generateDecks(numDeck):
     return deck + generateDecks(numDeck-1)
 
 def printCards(handlist):
+    print('\n' * 100)
+    print("You", end='\t\t')
+    for player in range(2,len(handlist) + 1):def printCards(handlist):
     print('\n' * 100)
     print("You" end='\t\t')
     for player in range(2,len(handlist) + 1):
@@ -40,7 +43,44 @@ def printCards(handlist):
                 print("- -", end='\t\t')
             else:
                 try:
-                    currCard = handlist[player[card]]
+                    currCard = handlist[player][card]
+                    if currCard.card <= 10:
+                        print(currCard.card, end =' ')
+                    elif currCard.card == 11:
+                        print("J", end=' ')
+                    elif currCard.card == 12:
+                        print("Q", end=' ')
+                    elif currCard.card == 13:
+                        print("K", end=' ')
+                    spade = "♠"
+                    heart = "♥"
+                    diamond = "♦"
+                    club = "♣"
+                    if currCard.suit == "Spade":
+                        print(spade, end = '\t\t')
+                    elif currCard.suit == 'Heart':
+                        print(heart, end = '\t\t')
+                    elif currCard.suit == 'Diamond':
+                        print(diamond, end = '\t\t')
+                    elif currCard.suit == 'Club':
+                        print(club, end = '\t\t')
+
+                except IndexError:
+                    print('\t\t')
+        print("Player ", player, end ='\t\t')
+    print("Dealer")
+    maxCardsToPrint= 0
+    for player in range(0,len(handlist+1)):
+        if len(handlist[player])>maxCardsToPrint:
+            maxCardsToPrint = len(handlist[player])
+
+    for card in range(0,maxCardsToPrint):
+        for player in range(0,len(handlist)+1):
+            if player == 0 and card >= 1:
+                print("- -", end='\t\t')
+            else:
+                try:
+                    currCard = handlist[player][card]
                     if currCard.card <= 10:
                         print(currCard.card, end =' ')
                     elif currCard.card == 11:
@@ -96,7 +136,7 @@ def PlayGame():
     # deal initial cards
     # handlist is in format of [ [player0 card0, player0 card0], ...]
     handlist = []
-    for player in range(0,numPlayers):
+    for player in range(0,numPlayers+2):
         handlist.append([deck[0],deck[1]])
         del deck[0:2]
 
@@ -111,19 +151,12 @@ def PlayGame():
             for card in handlist[0]:
                 totalpoints+=card.value
             hit = dealerChoice(totalpoints)
-
+        #if players turn
         elif currplayer == 1:
             while hit not in [0,1]:
+                printCards(handlist)
                 hit = input("Hit or miss?")
 
-        
-
-    # Tutorial
-    elif menuChoice ==1:
 
 
-def takeTurn(deck, currPlayer, playerpoints):
-    if currPlayer == 0:
-        #dealer
-    else:
-        print("It is currently Player ", currPlayer, "'s turn. Would you like to fold (0), or hit (1)? ")
+
