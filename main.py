@@ -178,13 +178,13 @@ def printWinners(handlist, numPlayers):
         if totalPoints(handlist, player) == 21 and player == numPlayers + 1:
             print("Dealer won!!!")
             winner = 1
-        elif totalPoints(handlist, player) == 21:
+        if totalPoints(handlist, player) == 21:
             print("Player ", player + 1, "won!!!")
             winner = 1
     if winner == 0:
         winner = [[0], 0]
         for player in range(0, numPlayers + 2):
-            if totalPoints(handlist, player) > winner[1]:
+            if totalPoints(handlist, player) > winner[1] and totalPoints(handlist, player) < 21:
                 winner[1] = totalPoints(handlist, player)
                 winner[0] = [player]
             elif totalPoints(handlist, player) == winner[1]:
@@ -224,39 +224,42 @@ def dealerChoice(handlist):
         return 0
 
 
-def PlayGame():
+def PlayGame(handlist, folded, deck):
     currplayer = 0
     while 0 in folded.values():
-        print("Player ", currplayer, "'s turn")
-        hit = ''
-        # if dealer's turn
-        if currplayer == numPlayers + 1:
-            hit = dealerChoice(handlist)
-        # if players turn
-        elif currplayer == 0:
-            while hit not in [0, 1]:
-                printCards(handlist)
-                hit = int(input("Hit or miss (1,0)?\n:"))
-        else:
-            hit = dealerChoice(handlist)
-            # hit = AI hit function
-        if hit == 1:
-            handlist[currplayer].append(deck[0])
-            del deck[0]
-            if totalPoints(handlist, currplayer) == 21:
-                folded[currplayer] = 1
-            elif totalPoints(handlist, currplayer) > 21:
-                for cardnumber in range(0, len(handlist[currplayer])):
-                    Card = handlist[currplayer][cardnumber]
-                    if Card.card == 1 and Card.value == 11:
-                        Card.value = 1
-                        break
-                if totalPoints(handlist, currplayer) > 21:
+        if folded[currplayer] == 0:
+            print("Player ", currplayer, "'s turn")
+            hit = ''
+            # if dealer's turn
+            if currplayer == numPlayers + 1:
+                hit = dealerChoice(handlist)
+            # if players turn
+            elif currplayer == 0:
+                while hit not in [0, 1]:
+                    printCards(handlist)
+                    hit = int(input("Hit or miss (1,0)?\n:"))
+            else:
+                hit = dealerChoice(handlist)
+                # hit = AI hit function
+            if hit == 1:
+                handlist[currplayer].append(deck[0])
+                del deck[0]
+                if totalPoints(handlist, currplayer) == 21:
                     folded[currplayer] = 1
+                elif totalPoints(handlist, currplayer) > 21:
+                    for cardnumber in range(0, len(handlist[currplayer])):
+                        Card = handlist[currplayer][cardnumber]
+                        if Card.card == 1 and Card.value == 11:
+                            Card.value = 1
+                            break
+                    if totalPoints(handlist, currplayer) > 21:
+                        folded[currplayer] = 1
+            else:
+                folded[currplayer] = 1
+        if currplayer == len(folded) - 1:
+            currplayer = 0
         else:
-            folded[currplayer] = 1
-        if 0 in folded.values():
-            currplayer = getnextplayer(folded, currplayer + 1)
+            currplayer += 1
 
 
 print("Welcome to")
@@ -295,7 +298,7 @@ for player in range(0, numPlayers + 2):
     else:
         folded[player] = 0
 
-PlayGame()
+PlayGame(handlist, folded, deck)
 
 printWinners(handlist, numPlayers)
 
