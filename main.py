@@ -78,6 +78,8 @@ def printCards(handlist, censored=True):
                     sortdict = {1:'A',11:'J',12:'Q',13:'K', 'Spade':"♠", 'Heart':"♥", 'Diamond':"♦", 'Club':"♣"}
                     if currCard.card in sortdict:
                         print(sortdict[currCard.card], end = ' ')
+                    else:
+                        print(currCard.card, end =' ')
                     print(sortdict[currCard.suit], end = endvar)
 
                 except IndexError:
@@ -99,7 +101,7 @@ def printWinners(handlist):
 
     winner = [[0], 0]
     for player in range(0, len(handlist)):
-        if totalPoints(handlist, player) > winner[1] and totalPoints(handlist, player) < 21:
+        if totalPoints(handlist, player) > winner[1] and totalPoints(handlist, player) <= 21:
             winner[1] = totalPoints(handlist, player)
             winner[0] = [player]
         elif totalPoints(handlist, player) == winner[1]:
