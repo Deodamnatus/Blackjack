@@ -1,7 +1,6 @@
 from random import shuffle
-import sys
 
-
+# print game title
 def printTitle():
     print(
         '''
@@ -49,64 +48,10 @@ def generateDecks(numDeck):
     return deck + generateDecks(numDeck - 1)
 
 
-# display uncensored list of cards for endgame where you should see dealer's cards
-def printFinal(handlist):
-    print('\n' * 100)
-    print("You     ", end='\t\t')
-
-    for player in range(2, len(handlist)):
-        print("Player ", player, end='\t\t')
-    print("Dealer  ")
-    maxCardsToPrint = 0
-    for player in range(0, len(handlist)):
-        if len(handlist[player]) > maxCardsToPrint:
-            maxCardsToPrint = len(handlist[player])
-
-    for card in range(0, maxCardsToPrint):
-        for player in range(0, len(handlist)):
-            if player == len(handlist) - 1:
-                endvar = '\n'
-            else:
-                endvar = '     \t\t'
-            try:
-                currCard = handlist[player][card]
-                if currCard.card == 1:
-                    print("A", end=' ')
-                elif currCard.card <= 10:
-                    print(currCard.card, end=' ')
-                elif currCard.card == 11:
-                    print("J", end=' ')
-                elif currCard.card == 12:
-                    print("Q", end=' ')
-                elif currCard.card == 13:
-                    print("K", end=' ')
-                spade = "♠"
-                heart = "♥"
-                diamond = "♦"
-                club = "♣"
-
-                if currCard.suit == "Spade":
-                    print(spade, end=endvar)
-                elif currCard.suit == 'Heart':
-                    print(heart, end=endvar)
-                elif currCard.suit == 'Diamond':
-                    print(diamond, end=endvar)
-                elif currCard.suit == 'Club':
-                    print(club, end=endvar)
-
-            except IndexError:
-                print('\t', end=endvar)
-    # print('')
-    for player in range(0, len(handlist)):
-        print("___     ", end='\t\t')
-    print('')
-    for player in range(0, len(handlist)):
-        print(totalPoints(handlist, player), '      ', end='\t\t')
-    print("\n" * 10)
 
 
 # display cards of players based on handlist
-def printCards(handlist):
+def printCards(handlist, censored=True):
     print('\n' * 100)
     print("You     ", end='\t\t')
 
@@ -120,38 +65,20 @@ def printCards(handlist):
 
     for card in range(0, maxCardsToPrint):
         for player in range(0, len(handlist)):
-            if player == len(handlist) - 1 and card >= 1:
+            if player == len(handlist) - 1 and card >= 1 and censored == True:
                 print("- -", end='\n')
             else:
                 if player == len(handlist) - 1:
                     endvar = '\n'
                 else:
                     endvar = '     \t\t'
+
                 try:
                     currCard = handlist[player][card]
-                    if currCard.card == 1:
-                        print("A", end=' ')
-                    elif currCard.card <= 10:
-                        print(currCard.card, end=' ')
-                    elif currCard.card == 11:
-                        print("J", end=' ')
-                    elif currCard.card == 12:
-                        print("Q", end=' ')
-                    elif currCard.card == 13:
-                        print("K", end=' ')
-                    spade = "♠"
-                    heart = "♥"
-                    diamond = "♦"
-                    club = "♣"
-
-                    if currCard.suit == "Spade":
-                        print(spade, end=endvar)
-                    elif currCard.suit == 'Heart':
-                        print(heart, end=endvar)
-                    elif currCard.suit == 'Diamond':
-                        print(diamond, end=endvar)
-                    elif currCard.suit == 'Club':
-                        print(club, end=endvar)
+                    sortdict = {1:'A',11:'J',12:'Q',13:'K', 'Spade':"♠", 'Heart':"♥", 'Diamond':"♦", 'Club':"♣"}
+                    if currCard.card in sortdict:
+                        print(sortdict[currCard.card], end = ' ')
+                    print(sortdict[currCard.suit], end = endvar)
 
                 except IndexError:
                     print('\t', end=endvar)
@@ -160,7 +87,7 @@ def printCards(handlist):
         print("___     ", end='\t\t')
     print('')
     for player in range(0, len(handlist)):
-        if player == len(handlist) - 1:
+        if player == len(handlist) - 1 and censored == True:
             print('???     ')
         else:
             print(totalPoints(handlist, player), '      ', end='\t\t')
@@ -168,48 +95,22 @@ def printCards(handlist):
 
 
 # print function for printing winners after game over
-def printWinners(handlist, numPlayers):
-    printFinal(handlist)
-    winner = 0
-    for player in range(0, numPlayers + 2):
-        if totalPoints(handlist, player) == 21 and player == 0:
-            print("You won!!!")
-            winner = 1
-        if totalPoints(handlist, player) == 21 and player == numPlayers + 1:
-            print("Dealer won!!!")
-            winner = 1
-        if totalPoints(handlist, player) == 21:
-            print("Player ", player + 1, "won!!!")
-            winner = 1
-    if winner == 0:
-        winner = [[0], 0]
-        for player in range(0, numPlayers + 2):
-            if totalPoints(handlist, player) > winner[1] and totalPoints(handlist, player) < 21:
-                winner[1] = totalPoints(handlist, player)
-                winner[0] = [player]
-            elif totalPoints(handlist, player) == winner[1]:
-                winner[0] = [player] + winner[0]
+def printWinners(handlist):
+
+    winner = [[0], 0]
+    for player in range(0, len(handlist)):
+        if totalPoints(handlist, player) > winner[1] and totalPoints(handlist, player) < 21:
+            winner[1] = totalPoints(handlist, player)
+            winner[0] = [player]
+        elif totalPoints(handlist, player) == winner[1]:
+            winner[0] = [player] + winner[0]
+    if len(handlist)-1 in winner[0]:
+        print("Dealer won!!!")
+    else:
         print("Player(s) ", end='')
         for player in winner[0]:
             print(player + 1, end=' ')
         print('won!!!')
-
-
-# currently messed up somehow (returns None or gets None as arguemnt somehow)TODO: fix this
-# I think that currentPlayer gets set to NoneType here somehow
-def getnextplayer(folded, playertocheck):
-    try:
-        if folded[playertocheck] == 0:
-            return playertocheck
-        else:
-            getnextplayer(folded, playertocheck + 1)
-    except KeyError:
-        playertocheck = 0
-        if folded[playertocheck] == 0:
-            return playertocheck
-        else:
-            getnextplayer(folded, playertocheck + 1)
-
 
 # decide what to do as dealer
 def dealerChoice(handlist):
@@ -298,9 +199,12 @@ for player in range(0, numPlayers + 2):
     else:
         folded[player] = 0
 
+
 PlayGame(handlist, folded, deck)
 
-printWinners(handlist, numPlayers)
+# prints uncensored version of game field
+printCards(handlist, False)
+printWinners(handlist)
 
 
 
